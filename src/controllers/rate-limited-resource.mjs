@@ -5,9 +5,7 @@ import redis from 'redis'
 
 const redisClient = redis.createClient()
 
-export default express
-    .Router()
-    .get('/', passport.authenticate('jwt'), (req, res) => {
+const authenticated = (req, res) => {
     const id = req.user._id.toString()
     redisClient.get(id, (err, result) => {
 
@@ -31,4 +29,17 @@ export default express
             })
         }
     })
-})
+}
+
+const unauthenticated = (err, req, res, next) => {
+    return res.status(StatusCodes.UNAUTHORIZED).render('unauthenticated.html')
+}
+
+export default express
+    .Router()
+    .get(
+        '/',
+        passport.authenticate('jwt', { failWithError: true }),
+        authenticated,
+        unauthenticated
+    )
