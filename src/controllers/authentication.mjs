@@ -2,7 +2,7 @@ import express from "express"
 import {StatusCodes} from "http-status-codes"
 import jwt from "jsonwebtoken"
 import User from './user.mjs'
-import {JWT_SECRET} from './config.mjs'
+import {JWT_SECRET} from '../config.mjs'
 
 const createToken = (id, email) => jwt.sign(
     {id, username: email},
