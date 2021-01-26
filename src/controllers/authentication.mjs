@@ -18,7 +18,7 @@ export default express.Router().post('/login', async (req, res) => {
     else{
         const user = await User.findOne({email:req.body.email}).select('+password')
 
-        if (!user || !user.comparePassword(req.body.password)) {
+        if (!user || !await user.comparePassword(req.body.password)) {
             res.status(StatusCodes.UNAUTHORIZED).json({
                 message: 'email or password is incorrect'
             })

@@ -1,26 +1,24 @@
 import 'express-async-errors' // wait for promises before responding, so users can receive error messages
 import express from 'express'
 import bodyParser from 'body-parser'
-import UserController from './user-controller.mjs'
-import AuthenticationController from './authentication-controller.mjs'
-import {StatusCodes} from "http-status-codes";
-import {initDatabase} from "./database.mjs";
-import passport from "./passport.mjs";
+import {StatusCodes} from 'http-status-codes'
+import consolidate from 'consolidate'
+import UserController from './controllers/user.mjs'
+import AuthenticationController from './controllers/authentication.mjs'
+import RateLimitedResourceController from './controllers/rate-limited-resource.mjs'
+import {initDatabase} from './database.mjs'
+import passport from './passport.mjs'
 
 const app = express()
 const port = 3000
 
 app.use(bodyParser.json()) // parse body
 app.use(passport.initialize()) // use Jwt authentification
+app.engine('html', consolidate.swig)
+app.set('view engine', 'html') // view engine
 app.use('/users', UserController) // User crud
 app.use('/', AuthenticationController) // Authentication
-
-app.get('/', passport.authenticate('jwt'), (req, res) => {
-    res.json({
-        status: 'ok'
-    })
-})
-
+app.use('/', RateLimitedResourceController) // Rate limited access
 
 // Catch async errors
 app.use(async (error, req, res, next) => {
@@ -34,7 +32,7 @@ app.use(async (error, req, res, next) => {
 // Resource not found
 app.use((req, res) => {
     res.status(StatusCodes.NOT_FOUND).json({
-        message: "Resource not found on this server"
+        message: 'Resource not found on this server'
     })
 })
 

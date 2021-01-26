@@ -42,8 +42,7 @@ UserSchema.pre('save', async function(next) {
 // Arrow functions explicitly prevent binding this, so the method will
 // not have access to the document. Hence we use es5 function.
 UserSchema.methods.comparePassword = function(password) {
-    console.log(password, this.password)
-    return bcrypt.compareSync(password, this.password);
+    return bcrypt.compare(password, this.password);
 }
 
 export default mongoose.model('User', UserSchema)
